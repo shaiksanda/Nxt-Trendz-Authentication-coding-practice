@@ -1,0 +1,35 @@
+/* Write your CSS code here */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-item {
+  font-family: 'Roboto';
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.logout-button {
+  width: 50px;
+  height: 30px;
+  border: none;
+  background-color: blueviolet;
+  color: wheat;
+  border-radius: 6px;
+}
+
+@media screen and (min-width: 768px) {
+  .nav-item {
+    font-size: 30px;
+    margin-right: 20px;
+  }
+  .header {
+    justify-content: space-evenly;
+  }
+  .logout-button {
+    width: 120px;
+  }
+}
