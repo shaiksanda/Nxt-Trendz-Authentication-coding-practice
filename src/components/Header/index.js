@@ -13,9 +13,12 @@ const Header = props => {
         />
       </div>
       <div style={{display: 'flex', alignItems: 'center'}}>
-        <li className="nav-item">Home</li>
-        <li className="nav-item">Products</li>
-        <li className="nav-item">Cart</li>
+        <ul>
+          {' '}
+          <li className="nav-item">Home</li>
+          <li className="nav-item">Products</li>
+          <li className="nav-item">Cart</li>
+        </ul>
         <button type="button" className="logout-button">
           Logout
         </button>

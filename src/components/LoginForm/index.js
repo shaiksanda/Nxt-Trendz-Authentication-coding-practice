@@ -5,17 +5,16 @@ class LoginForm extends Component {
   state = {
     username: '',
     password: '',
-    usernameError: '',
-    passwordError: '',
-    loginError: '',
+    showSubmitError: false,
+    errorMsg: '',
   }
 
   onChangeUsername = event => {
-    this.setState({username: event.target.value, usernameError: ''})
+    this.setState({username: event.target.value})
   }
 
   onChangePassword = event => {
-    this.setState({password: event.target.value, passwordError: ''})
+    this.setState({password: event.target.value})
   }
 
   onSubmitSuccess = () => {
@@ -23,49 +22,51 @@ class LoginForm extends Component {
     history.replace('/')
   }
 
+  onSubmitFailure = errorMsg => {
+    this.setState({showSubmitError: true, errorMsg})
+  }
+
   submitForm = async event => {
     event.preventDefault()
 
     const {username, password} = this.state
-    let valid = true
 
-    if (username === '') {
-      this.setState({usernameError: 'Username cannot be empty'})
-      valid = false
-    }
-
-    if (password === '') {
-      this.setState({passwordError: 'Password cannot be empty'})
-      valid = false
-    }
-
-    if (!valid) return
-
-    const userDetails = {username, password}
-
-    const url = 'https://apis.ccbp.in/login'
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userDetails),
-    }
-
-    const response = await fetch(url, options)
-    const data = await response.json()
-
-    if (response.ok) {
-      this.onSubmitSuccess()
+    // Validation for empty username and/or password
+    if (username === '' && password === '') {
+      this.onSubmitFailure('Username and password cannot be empty')
+    } else if (username === '') {
+      this.onSubmitFailure('Username cannot be empty')
+    } else if (password === '') {
+      this.onSubmitFailure('Password cannot be empty')
     } else {
-      this.setState({
-        loginError: data.error_msg || 'Invalid username or password',
-      })
+      // Proceed with API call if validation is successful
+      const userDetails = {username, password}
+      const url = 'https://apis.ccbp.in/login'
+      const options = {
+        method: 'POST',
+
+        body: JSON.stringify(userDetails),
+      }
+
+      try {
+        const response = await fetch(url, options)
+        const data = await response.json()
+
+        if (response.ok) {
+          this.onSubmitSuccess()
+        } else {
+          // Handle server-side errors
+          this.onSubmitFailure(data.error_msg || 'Invalid username or password')
+        }
+      } catch (error) {
+        // Handle network errors
+        this.onSubmitFailure('Something went wrong. Please try again.')
+      }
     }
   }
 
   renderInputUserNameField = () => {
-    const {usernameError} = this.state
+    const {username} = this.state
     return (
       <>
         <label className="label" htmlFor="username">
@@ -79,14 +80,14 @@ class LoginForm extends Component {
           onChange={this.onChangeUsername}
           placeholder="username"
           autoComplete="username"
+          value={username}
         />
-        {usernameError && <p className="error-message">{usernameError}</p>}
       </>
     )
   }
 
   renderInputPasswordField = () => {
-    const {passwordError} = this.state
+    const {password} = this.state
     return (
       <>
         <label className="label" htmlFor="password">
@@ -99,16 +100,19 @@ class LoginForm extends Component {
           className="input"
           type="password"
           id="password"
+          value={password}
           autoComplete="current-password"
         />
-        {passwordError && <p className="error-message">{passwordError}</p>}
         <br />
       </>
     )
   }
 
   render() {
-    const {loginError} = this.state
+    const {showSubmitError, errorMsg} = this.state
+    console.log('showSubmitError:', showSubmitError)
+    console.log('errorMsg:', errorMsg)
+
     return (
       <div className="login-container">
         <img
@@ -130,7 +134,7 @@ class LoginForm extends Component {
                 Login🔒
               </button>
             </div>
-            {loginError && <p className="error-message">{loginError}</p>}
+            {showSubmitError && <p className="error-message">*{errorMsg}</p>}
           </form>
         </div>
       </div>
